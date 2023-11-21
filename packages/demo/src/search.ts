@@ -20,91 +20,15 @@ import {
   sortBy,
 } from "./widgets";
 
-import { Facets, Schema, TQuickscoreIndex } from "@stereobooster/facets";
-import { getSearchClient } from "@stereobooster/facets-instantsearch";
+import { getSearchClient } from "@stereobooster/pagefind-instantsearch";
 
-const schema = {
-  name: {
-    type: "string",
-    text: true,
-  },
-  description: {
-    type: "string",
-    text: true,
-  },
-  brand: {
-    type: "string",
-    facet: true,
-  },
-  categories: {
-    type: "string",
-    isArray: true,
-    facet: true,
-  },
-  "hierarchicalCategories.lvl0": {
-    type: "string",
-    facet: true,
-    isObject: true,
-  },
-  "hierarchicalCategories.lvl1": {
-    type: "string",
-    facet: true,
-    isObject: true,
-  },
-  // "hierarchicalCategories.lvl2": {
-  //   type: "string",
-  //   facet: true,
-  //   isObject: true,
-  // },
-  // "hierarchicalCategories.lvl3": {
-  //   type: "string",
-  //   facet: true,
-  //   isObject: true,
-  // },
-  price: {
-    type: "number",
-    facet: {
-      showZeroes: true,
-    },
-  },
-  image: {
-    type: "string",
-  },
-  url: {
-    type: "string",
-  },
-  free_shipping: {
-    type: "boolean",
-    facet: true,
-  },
-  rating: {
-    type: "number",
-    facet: {
-      showZeroes: true,
-    },
-  },
-  // TODO: sort by popularity by default?
-  popularity: {
-    type: "number",
-  },
-  // type: {
-  //   type: "string",
-  // },
-  // price_range: {
-  //   type: "string",
-  // },
-  // objectID: {
-  //   type: "string",
-  // },
-} satisfies Schema;
+// @ts-expect-error
+import * as pagefind from "../public/pagefind/pagefind.js";
+// const pagefind = await import("../public/pagefind/pagefind.js");
+pagefind.init();
+await pagefind.filters();
 
-const data = await fetch("/records.json").then((x) => x.json());
-// if there would be facets client as webworker e.g. asyncrhonious it would need separate adapter
-const index = new Facets(
-  { textIndex: TQuickscoreIndex, schema, idKey: "objectID" },
-  data
-);
-const searchClient = getSearchClient(index);
+const searchClient = getSearchClient(pagefind);
 const search = instantsearch({
   searchClient,
   indexName: "instant_search",

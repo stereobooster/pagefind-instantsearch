@@ -16,6 +16,7 @@
   "repository": "git@github.com:stereobooster/pagefind-instantsearch.git",
   "homepage": "https://github.com/stereobooster/facets/tree/main/packages/pagefind-instantsearch",
   "type": "module",
+  "bin": "bin/pfis.js",
   "source": "src/index.ts",
   "exports": {
     "types": "./dist/index.d.ts",

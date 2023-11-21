@@ -14,8 +14,7 @@
   "dependencies": {
     "@stereobooster/pagefind-instantsearch": "workspace:*",
     "instantsearch.css": "^8.1.0",
-    "instantsearch.js": "4.60.0",
-    "quick-score": "^0.2.0"
+    "instantsearch.js": "4.60.0"
   },
   "devDependencies": {
     "pagefind": "^1.0.4",
