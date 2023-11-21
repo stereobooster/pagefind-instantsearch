@@ -1,6 +1,6 @@
-# facets-instantsearch demo
+# pagefind-instantsearch demo
 
-Demo of [`facets`](https://github.com/stereobooster/facets) + `facets-instantsearch`.
+Demo of [`pagefind-instantsearch`](https://github.com/stereobooster/pagefind-instantsearch).
 
 Copy paste of [instantsearch e-commerce example](https://github.com/algolia/instantsearch/tree/master/examples/js/e-commerce) with slight changes.
 
