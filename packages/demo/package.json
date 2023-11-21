@@ -1,0 +1,25 @@
+{
+  "name": "facets-instantsearch-demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'Not tests here'",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@stereobooster/pagefind-instantsearch": "workspace:*",
+    "instantsearch.css": "^8.1.0",
+    "instantsearch.js": "4.60.0",
+    "quick-score": "^0.2.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.0.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}

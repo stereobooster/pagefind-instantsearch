@@ -1,0 +1,52 @@
+{
+  "name": "@stereobooster/pagefind-instantsearch",
+  "version": "0.1.0",
+  "description": "InstantSearch.js adapter for pagefind",
+  "keywords": [
+    "instantsearch",
+    "faceted",
+    "search",
+    "search-engine",
+    "fulltext",
+    "browser",
+    "client-side"
+  ],
+  "author": "stereobooster",
+  "license": "MIT",
+  "repository": "git@github.com:stereobooster/pagefind-instantsearch.git",
+  "homepage": "https://github.com/stereobooster/facets/tree/main/packages/pagefind-instantsearch",
+  "type": "module",
+  "source": "src/index.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.modern.js"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
+  "files": [
+    "./dist/*"
+  ],
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "echo 'Not tests here'",
+    "prepublishOnly": "npm run build",
+    "build": "rm -rf dist && microbundle",
+    "dev": "microbundle watch",
+    "clean": "rm -rf dist",
+    "tsc": "tsc"
+  },
+  "peerDependencies": {
+    "@algolia/client-search": "^4.20.0",
+    "pagefind": "^1.0.4"
+  },
+  "devDependencies": {
+    "@algolia/client-search": "^4.20.0",
+    "instantsearch.js": "4.60.0",
+    "microbundle": "^0.15.1",
+    "pagefind": "^1.0.4",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6"
+  }
+}
