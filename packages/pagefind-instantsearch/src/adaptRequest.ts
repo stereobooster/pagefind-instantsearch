@@ -1,30 +1,24 @@
 import { MultipleQueriesQuery } from "@algolia/client-search";
-import { Schema, SearchOptions } from "@stereobooster/facets";
+import { Schema } from "./Facets";
 
 export function adaptRequest<S extends Schema>(
   request: MultipleQueriesQuery,
-  schema: Schema
-): SearchOptions<S> {
-  const highlight =
-    request.params?.highlightPostTag && request.params?.highlightPreTag
-      ? {
-          start: request.params.highlightPreTag,
-          end: request.params.highlightPostTag,
-          key: "_highlightResult",
-          subKey: "value",
-        }
-      : undefined;
+  _schema?: S
+) {
+  // const highlight =
+  //   request.params?.highlightPostTag && request.params?.highlightPreTag
+  //     ? {
+  //         start: request.params.highlightPreTag,
+  //         end: request.params.highlightPostTag,
+  //         key: "_highlightResult",
+  //         subKey: "value",
+  //       }
+  //     : undefined;
 
+  adaptNumericFilters(request.params?.numericFilters as any);
   return {
-    query: request.params?.query,
-    page: request.params?.page,
-    perPage: request.params?.hitsPerPage,
     sort: adaptSort(request.indexName),
-    facetFilter: {
-      ...adaptFacetFilters(request.params?.facetFilters as any, schema),
-      ...adaptNumericFilters(request.params?.numericFilters as any),
-    } as any,
-    highlight,
+    filters: adaptFacetFilters(request.params?.facetFilters as any),
   };
 }
 
@@ -39,44 +33,36 @@ export function adaptSort(indexName?: string) {
 }
 
 export function adaptFacetFilters(
-  facetFilters: string | string[] | string[][] | undefined,
-  schema: Schema
+  facetFilters: string | string[] | string[][] | undefined
 ) {
   const filter: Record<string, string[]> = Object.create(null);
 
   if (!facetFilters) return filter;
   if (typeof facetFilters === "string") {
-    adaptFacetFilter(facetFilters, filter, schema);
+    adaptFacetFilter(facetFilters, filter);
     return filter;
   }
 
   facetFilters.forEach((facets) => {
     if (Array.isArray(facets)) {
-      facets.forEach((facet) => adaptFacetFilter(facet, filter, schema));
+      facets.forEach((facet) => adaptFacetFilter(facet, filter));
     } else {
-      adaptFacetFilter(facets, filter, schema);
+      adaptFacetFilter(facets, filter);
     }
   });
 
   return filter;
 }
 
-export function adaptFacetFilter(
-  facet: string,
-  filter: Record<string, string[]>,
-  schema: Schema
-) {
+// https://pagefind.app/docs/js-api-filtering/#using-compound-filters
+export function adaptFacetFilter(facet: string, filter: Record<string, any>) {
   const facetRegex = new RegExp(/(.+)(:)(.+)/);
   let [, field, , value] = facet.match(facetRegex) || [];
 
-  if (schema[field].type === "boolean") {
-    // @ts-expect-error fix later
-    value = value === "true" ? true : value === "false" ? false : value;
-  }
   if (filter[field]) {
-    filter[field].push(value);
+    filter[field].any.push(value);
   } else {
-    filter[field] = [value];
+    filter[field] = { any: [value] };
   }
 }
 
@@ -87,6 +73,7 @@ export function adaptNumericFilters(
     Object.create(null);
 
   if (!numericFilters) return filter;
+  console.log(numericFilters);
   if (typeof numericFilters === "string") {
     adaptNumericFilter(numericFilters, filter);
     return filter;
