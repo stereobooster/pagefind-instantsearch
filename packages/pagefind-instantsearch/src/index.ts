@@ -1,12 +1,11 @@
 import {
   MultipleQueriesResponse,
   MultipleQueriesQuery,
-  // SearchOptions,
-  // SearchForFacetValuesQueryParams,
-  // SearchForFacetValuesResponse,
+  SearchOptions,
+  SearchForFacetValuesQueryParams,
+  SearchForFacetValuesResponse,
 } from "@algolia/client-search";
-// import { FacetHit, SearchClient } from "instantsearch.js";
-import { SearchClient } from "instantsearch.js";
+import { FacetHit, SearchClient } from "instantsearch.js";
 
 import { Schema as S } from "./Facets";
 export type Schema = S;
@@ -28,8 +27,6 @@ export function getSearchClient<S extends Schema>(
             request.params?.query,
             adaptRequest(request)
           );
-          // console.log(request);
-          // console.log(response);
 
           const page = request.params?.page || 0;
           const hitsPerPage = request.params?.hitsPerPage || 16;
@@ -39,8 +36,9 @@ export function getSearchClient<S extends Schema>(
               .map(adaptHit)
           );
           const nbHits = response.results.length;
-          const facets =
-            nbHits === 0 ? await index.filters() : response.filters;
+          const facets = !request.params?.query
+            ? await index.filters()
+            : response.filters;
           const maxValuesPerFacet = request.params?.maxValuesPerFacet || 10;
 
           return {
@@ -58,36 +56,49 @@ export function getSearchClient<S extends Schema>(
         })
       ).then((results) => ({ results })) as any,
 
-    // searchForFacetValues: (
-    //   queries: ReadonlyArray<{
-    //     readonly indexName: string;
-    //     readonly params: SearchForFacetValuesQueryParams & SearchOptions;
-    //   }>
-    // ): Readonly<Promise<readonly SearchForFacetValuesResponse[]>> => {
-    //   // This is quite primitive implementation. Better would be to use TrieMap
-    //   return Promise.resolve(
-    //     queries.map((querie) => ({
-    //       exhaustiveFacetsCount: true,
-    //       facetHits: index
-    //         .facet(
-    //           {
-    //             field: querie.params.facetName,
-    //             query: querie.params.facetQuery,
-    //             perPage:
-    //               querie.params.maxFacetHits || querie.params.maxValuesPerFacet,
-    //           },
-    //           adaptRequest(querie.params as any, index.config().schema)
-    //         )
-    //         .items.map(
-    //           ([value, count]) =>
-    //             ({
-    //               value,
-    //               count,
-    //               highlighted: value,
-    //             } as FacetHit)
-    //         ),
-    //     }))
-    //   );
-    // },
+    searchForFacetValues: (
+      requests: ReadonlyArray<{
+        readonly indexName: string;
+        readonly params: SearchForFacetValuesQueryParams & SearchOptions;
+      }>
+    ): Readonly<Promise<readonly SearchForFacetValuesResponse[]>> => {
+      // This is quite primitive implementation. Better would be to use TrieMap
+      return Promise.all(
+        requests.map(async (request) => {
+          const response = await index.search(
+            request.params?.query,
+            adaptRequest(request)
+          );
+
+          const facets = !request.params?.query
+            ? await index.filters()
+            : response.filters;
+
+          return {
+            exhaustiveFacetsCount: true,
+            facetHits: Object.entries(facets[request.params.facetName])
+              .filter(
+                ([value, count]: [string, any]) =>
+                  value
+                    .toLocaleLowerCase()
+                    .startsWith(request.params.facetQuery) && count > 0
+              )
+              .sort((a: [string, any], b: [string, any]) => b[1] - a[1])
+              .slice(
+                0,
+                request.params.maxFacetHits || request.params.maxValuesPerFacet
+              )
+              .map(
+                ([value, count]) =>
+                  ({
+                    value,
+                    count,
+                    highlighted: value,
+                  } as FacetHit)
+              ),
+          };
+        })
+      );
+    },
   };
 }

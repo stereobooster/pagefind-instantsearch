@@ -2,24 +2,11 @@ import { Hit, SearchResponse } from "@algolia/client-search";
 import { SearchResults, Schema, Item } from "@stereobooster/facets";
 
 export function adaptResponse<S extends Schema, I extends Item<S>>(
-  response: SearchResults<S, I>,
-  query: string,
-  idKey: string | undefined
+  _response: SearchResults<S, I>,
+  _query: string,
+  _idKey: string | undefined
 ): SearchResponse<I> {
-  return {
-    hits:
-      idKey === "objectID"
-        ? (response.items as any)
-        : response.items.map(adaptHit),
-    page: response.pagination.page,
-    hitsPerPage: response.pagination.perPage,
-    nbHits: response.pagination.total,
-    nbPages: Math.ceil(response.pagination.total / response.pagination.perPage),
-    processingTimeMS: 0,
-    query,
-    exhaustiveNbHits: true,
-    params: "",
-  };
+  return null as any
 }
 
 const markRegexp = /<mark>([^<]+)<\/mark>/g;
@@ -39,9 +26,17 @@ export function adaptHighlight(
   excerpt: string,
   textFields: string[]
 ) {
-  const matchedWords = [
+  let matchedWords = [
     ...new Set([...excerpt.matchAll(markRegexp)].map(([, x]) => x)),
-  ].sort((a, b) => a.length - b.length);
+  ]
+    .filter((a) => a.length > 3)
+    .sort((a, b) => a.length - b.length);
+  if (matchedWords.length === 0) return item;
+  if (matchedWords.length > 1) {
+    matchedWords = matchedWords.filter(
+      (x) => x === matchedWords[0] || !x.startsWith(matchedWords[0])
+    );
+  }
   const _highlightResult: Record<string, any> = {};
   textFields.forEach((field) => {
     _highlightResult[field] = {
