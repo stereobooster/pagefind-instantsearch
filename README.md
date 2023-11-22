@@ -14,7 +14,7 @@ To do so I wanted to use the same Schema as in **facets**:
 - [to convert JSON file to pagefind index](/packages/demo/bin/pfis.js)
 - [to convert pagefind response to InstantSearch Hit](/packages/pagefind-instantsearch/src/adaptResponse.ts)
 
-I started implementation with hardcoded conversion. I managed to create a working demo. However, I realized that pagefind can't be used as a general faceted search engine.
+I started implementation with hardcoded conversion. I managed to create a [working demo](https://pagefind-instantsearch.netlify.app/search/?query=chrome). However, I realized that pagefind can't be used as a general faceted search engine.
 
 ### Type conversion
 
