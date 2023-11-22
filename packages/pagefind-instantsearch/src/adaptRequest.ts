@@ -5,16 +5,6 @@ export function adaptRequest<S extends Schema>(
   request: MultipleQueriesQuery,
   _schema?: S
 ) {
-  // const highlight =
-  //   request.params?.highlightPostTag && request.params?.highlightPreTag
-  //     ? {
-  //         start: request.params.highlightPreTag,
-  //         end: request.params.highlightPostTag,
-  //         key: "_highlightResult",
-  //         subKey: "value",
-  //       }
-  //     : undefined;
-
   adaptNumericFilters(request.params?.numericFilters as any);
   return {
     sort: adaptSort(request.indexName),
@@ -73,7 +63,6 @@ export function adaptNumericFilters(
     Object.create(null);
 
   if (!numericFilters) return filter;
-  console.log(numericFilters);
   if (typeof numericFilters === "string") {
     adaptNumericFilter(numericFilters, filter);
     return filter;

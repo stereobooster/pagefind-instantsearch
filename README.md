@@ -22,7 +22,6 @@ pnpm run dev
 - adapter for instantsearch
   - https://pagefind.app/docs/js-api-filtering/
   - filtering for numeric facets
-  - highlighting
   - sorting
   - search for facets
 - update readme
