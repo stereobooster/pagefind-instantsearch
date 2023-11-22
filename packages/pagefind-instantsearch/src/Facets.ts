@@ -1,5 +1,4 @@
 type SortDirection = "asc" | "desc";
-type SupportedFieldTypes = string | number | boolean | null;
 type SupportedFieldTypesTypes = "string" | "number" | "boolean";
 
 type FieldConfig = SortConfig & {
@@ -33,22 +32,6 @@ export type FacetsConfig<S extends Schema> = {
   idKey?: string;
 };
 
-type FacetFilterType<T extends SupportedFieldTypesTypes> = T extends "string"
-  ? Array<string | null>
-  : T extends "number"
-  ? Array<number | null> | { from?: number; to?: number }
-  : T extends "boolean"
-  ? Array<boolean | null>
-  : never;
-
-type FacetFilter<S extends Schema> = {
-  [K in keyof S]?: S[K]["facet"] extends boolean
-    ? FacetFilterType<S[K]["type"]>
-    : S[K]["facet"] extends FacetConfig
-    ? FacetFilterType<S[K]["type"]>
-    : never;
-};
-
 export type Item<S extends Schema> = {
   [K in keyof S]?: S[K]["type"] extends "string"
     ? string | null | Array<string | null>
@@ -57,16 +40,6 @@ export type Item<S extends Schema> = {
     : S[K]["type"] extends "boolean"
     ? boolean | null | Array<boolean | null>
     : never;
-};
-
-type FacetStats = {
-  min: number;
-  max: number;
-};
-
-type FacetResult<T = SupportedFieldTypes> = {
-  items: Array<[T | null, number]>;
-  stats: T extends number ? FacetStats : undefined;
 };
 
 type SortConfig = {

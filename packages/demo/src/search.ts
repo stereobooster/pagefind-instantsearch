@@ -20,11 +20,13 @@ import {
   sortBy,
 } from "./widgets";
 
+// @ts-expect-error
 import { schema } from "./schema.js";
 import { getSearchClient } from "@stereobooster/pagefind-instantsearch";
 
-import * as pagefind from "../public/pagefind/pagefind.js";
-// const pagefind = await import("../public/pagefind/pagefind.js");
+// @ts-expect-error
+// import * as pagefind from "../public/pagefind/pagefind.js";
+const pagefind = await import("../public/pagefind/pagefind.js");
 pagefind.init();
 await pagefind.filters();
 
