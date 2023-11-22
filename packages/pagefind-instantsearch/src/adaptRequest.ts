@@ -19,7 +19,7 @@ export function adaptSort(indexName?: string) {
   const field = parts[parts.length - 2];
   const order = parts[parts.length - 1];
   if (order !== "asc" && order !== "desc") return;
-  return [field, order] as [string, "asc" | "desc"];
+  return { [field]: order };
 }
 
 export function adaptFacetFilters(

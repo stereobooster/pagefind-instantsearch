@@ -45,9 +45,10 @@ function schemaToTransformer(_schema) {
         rating: [`${item.rating}`],
         free_shipping: [`${item.free_shipping}`],
       },
-      // sort: {
-      //   weight: `${item.popularity}`,
-      // },
+      sort: {
+        popularity: `${item.popularity}`.padStart(5, '0'),
+        price: item.price.toFixed(2).padStart(7, '0')
+      },
     };
   };
 }
