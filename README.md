@@ -1,4 +1,4 @@
-# Facets monorepo
+# InstantSearch adapter for pagefind monorepo
 
 It is the monorepo repository:
 
@@ -7,18 +7,18 @@ It is the monorepo repository:
 
 ## Idea
 
-Idea is to create InstantSearch adapter for pagefind and build the same demo site as I did for [facets](https://github.com/stereobooster/facets). This way we can compare "apples to apples".
+The idea is to create an InstantSearch adapter for [pagefind](https://pagefind.app/) and build the same demo site as I did for [facets](https://github.com/stereobooster/facets). This way we can compare "apples to apples".
 
-In order to do so I wanted to use same Schema as in **facets**:
+To do so I wanted to use the same Schema as in **facets**:
 
 - [to convert JSON file to pagefind index](/packages/demo/bin/pfis.js)
 - [to convert pagefind response to InstantSearch Hit](/packages/pagefind-instantsearch/src/adaptResponse.ts)
 
-I started implementation with hardcoded conversion. I managed to create working demo. But I realized that pagenfind can't be used as general faceted search engine.
+I started implementation with hardcoded conversion. I managed to create a working demo. However, I realized that pagefind can't be used as a general faceted search engine.
 
-### Convertion
+### Type conversion
 
-pagefind supports only string values, so all values need to be converted to strings before indexing and back to initial type on the client side.
+pagefind supports only string values, so all values need to be converted to strings before indexing and back to the initial type on the client side.
 
 Indexing:
 
@@ -30,7 +30,7 @@ rating: [`${item.rating}`],
 free_shipping: [`${item.free_shipping}`],
 ```
 
-Client side:
+Client-side:
 
 ```ts
 {
@@ -55,7 +55,7 @@ sort: {
 
 ### Stats for numerical facets
 
-Because there is no support for number in order to get stats we need to conver strings to numbers on the client side and calculate stats:
+Because there is no support for numbers to get stats we need to convert strings to numbers on the client side and calculate stats:
 
 ```ts
 if (schema[field]?.type === "number") {
@@ -70,11 +70,11 @@ if (schema[field]?.type === "number") {
 
 ### Filter for numeric fields
 
-I didn't implement filter for numeric fields, like `price >= 40 AND price <= 100`. Price slider doesn't work in the deme
+I didn't implement a filter for numeric fields, like `price >= 40 AND price <= 100`. The price slider doesn't work in the deme
 
 ## Status
 
-After I realized that it is not practical to use as general faceted search engine I gave up and didn't finish code for schema transformation.
+After I realized that it was not practical to use a general faceted search engine I gave up and didn't finish code for schema transformation.
 
 **This code is not recomended for prodcution use**.
 
