@@ -8,7 +8,12 @@ export const products = hits({
     item: (hit, { html, components }) => html`
       <article class="hit">
         <header class="hit-image-container">
-          <img src="${hit.image}" alt="${hit.name}" class="hit-image" loading="lazy" />
+          <img
+            src="${hit.image}"
+            alt="${hit.name}"
+            class="hit-image"
+            loading="lazy"
+          />
         </header>
 
         <div class="hit-info-container">
@@ -49,7 +54,12 @@ export const products = hits({
       </article>
     `,
     empty: (searchResults, { html }) => {
+      const query = searchResults._state.query;
       const hasRefinements = searchResults.getRefinements().length > 0;
+      const message =
+        query == ""
+          ? "Type any query in order to start"
+          : "Sorry, we can't find any matches to your query!";
       const description = hasRefinements
         ? "Try to reset your applied filters."
         : "Please try another query.";
@@ -132,10 +142,10 @@ export const products = hits({
             </g>
           </svg>
 
-          <p class="hits-empty-state-title">
-            Sorry, we can't find any matches to your query!
+          <p class="hits-empty-state-title">${message}</p>
+          <p class="hits-empty-state-description">
+            ${query != "" ? description : ""}
           </p>
-          <p class="hits-empty-state-description">${description}</p>
         </div>
       `;
     },
