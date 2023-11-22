@@ -1,8 +1,8 @@
 import { Hit, SearchResponse } from "@algolia/client-search";
-import { SearchResults, Schema, Item } from "@stereobooster/facets";
+import { Schema, Item } from "./Facets";
 
 export function adaptResponse<S extends Schema, I extends Item<S>>(
-  _response: SearchResults<S, I>,
+  _response: any,
   _query: string,
   _idKey: string | undefined
 ): SearchResponse<I> {
