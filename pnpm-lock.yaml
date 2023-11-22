@@ -26,13 +26,7 @@ importers:
       instantsearch.js:
         specifier: 4.60.0
         version: 4.60.0(algoliasearch@4.20.0)
-      quick-score:
-        specifier: ^0.2.0
-        version: 0.2.0
     devDependencies:
-      '@algolia/client-search':
-        specifier: ^4.20.0
-        version: 4.20.0
       pagefind:
         specifier: ^1.0.4
         version: 1.0.4
@@ -4053,10 +4047,6 @@ packages:
   /qs@6.9.7:
     resolution: {integrity: sha512-IhMFgUmuNpyRfxA90umL7ByLlgRXu6tIfKPpF5TmcfRLlLCckfP/g3IQmju6jjpu+Hh8rA+2p6A27ZSPOOHdKw==}
     engines: {node: '>=0.6'}
-
-  /quick-score@0.2.0:
-    resolution: {integrity: sha512-y9PW9rl7BhjTykkGYi4wh0FsXWrWFv3IJVxtAI9FMargSOhqzRN3OjO2itpw63PoSu1FY07i8B2aCwpolQucOQ==}
-    dev: false
 
   /randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
