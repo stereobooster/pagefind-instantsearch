@@ -44,7 +44,7 @@ Client-side:
 
 ### Sorting
 
-To sort by numbers we need to convert values to alphabetically sortable strings:
+~~To sort by numbers we need to convert values to alphabetically sortable strings:~~
 
 ```js
 sort: {

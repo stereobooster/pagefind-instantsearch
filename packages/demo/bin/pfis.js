@@ -46,8 +46,8 @@ function schemaToTransformer(_schema) {
         free_shipping: [`${item.free_shipping}`],
       },
       sort: {
-        popularity: `${item.popularity}`.padStart(5, '0'),
-        price: item.price.toFixed(2).padStart(7, '0')
+        popularity: item.popularity.toString(),
+        price: item.price.toString()
       },
     };
   };
