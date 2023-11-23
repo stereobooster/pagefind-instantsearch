@@ -44,14 +44,7 @@ Client-side:
 
 ### Sorting
 
-~~To sort by numbers we need to convert values to alphabetically sortable strings:~~
-
-```js
-sort: {
-  popularity: `${item.popularity}`.padStart(5, '0'),
-  price: item.price.toFixed(2).padStart(7, '0')
-},
-```
+See https://github.com/CloudCannon/pagefind/issues/513
 
 ### Stats for numerical facets
 
