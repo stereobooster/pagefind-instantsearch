@@ -44,7 +44,10 @@ Client-side:
 
 ### Sorting
 
-See https://github.com/CloudCannon/pagefind/issues/513
+See:
+
+- https://github.com/CloudCannon/pagefind/issues/513
+- https://github.com/CloudCannon/pagefind/issues/259
 
 ### Stats for numerical facets
 

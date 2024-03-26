@@ -13,13 +13,15 @@ export type Schema = S;
 import { adaptHit, adaptFacets } from "./adaptResponse";
 import { adaptRequest } from "./adaptRequest";
 
+const isEmpty = (o: Record<string, any>) => Object.keys(o).length === 0;
+
 export function getSearchClient<S extends Schema>(
   clientPromise: Promise<any>,
   schema: S
 ): SearchClient {
   const indexPromise = clientPromise.then(async (pagefind) => {
     pagefind.init();
-    await pagefind.filters();
+    pagefind.filters();
     return pagefind;
   });
 
@@ -45,7 +47,8 @@ export function getSearchClient<S extends Schema>(
                   .map(adaptHit)
               );
               const nbHits = response.results.length;
-              const facets = !request.params?.query
+              // TODO: if search is null and there are no filters - use `await index.filters()`
+              const facets = isEmpty(response.filters)
                 ? await index.filters()
                 : response.filters;
               const maxValuesPerFacet = request.params?.maxValuesPerFacet || 10;
@@ -77,11 +80,12 @@ export function getSearchClient<S extends Schema>(
         Promise.all(
           requests.map(async (request) => {
             const response = await index.search(
-              request.params?.query,
+              request.params?.query?.trim() || null,
               adaptRequest(request)
             );
 
-            const facets = !request.params?.query
+            // TODO: if search is null and there are no filters - use `await index.filters()`
+            const facets = isEmpty(response.filters)
               ? await index.filters()
               : response.filters;
 

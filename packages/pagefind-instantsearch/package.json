@@ -43,11 +43,11 @@
     "pagefind": "^1.0.4"
   },
   "devDependencies": {
-    "@algolia/client-search": "^4.20.0",
-    "instantsearch.js": "4.60.0",
+    "@algolia/client-search": "^4.23.1",
+    "instantsearch.js": "4.66.0",
     "microbundle": "^0.15.1",
     "pagefind": "^1.0.4",
-    "typescript": "^5.2.2",
-    "vitest": "^0.34.6"
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
   }
 }
