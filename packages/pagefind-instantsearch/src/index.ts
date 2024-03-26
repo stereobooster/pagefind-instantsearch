@@ -24,7 +24,8 @@ export function getSearchClient<S extends Schema>(
       Promise.all(
         requests.map(async (request) => {
           const response = await index.search(
-            request.params?.query,
+            // https://github.com/CloudCannon/pagefind/issues/546#issuecomment-1896570871
+            request.params?.query?.trim() || null,
             adaptRequest(request)
           );
 
