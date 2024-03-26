@@ -3,7 +3,7 @@
 It is the monorepo repository:
 
 - [InstantSearch adapter for pagefind](/packages/pagefind-instantsearch/) ![npm version](https://img.shields.io/npm/v/%40stereobooster/pagefind-instantsearch)
-- and [demo site](/packages/demo/)
+- and [demo site](/packages/demo/) [![Netlify Status](https://api.netlify.com/api/v1/badges/de122c5e-5f64-420a-b228-f75563011a9c/deploy-status)](https://app.netlify.com/sites/pagefind-instantsearch/deploys)
 
 ## Idea
 
