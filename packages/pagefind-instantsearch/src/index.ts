@@ -38,32 +38,49 @@ export function getSearchClient<S extends Schema>(
               const query = request.params?.query?.trim() || null;
               const filters = adaptRequest(request, await initialFacets);
               const empty = isEmpty(filters.filters) && !query;
-              Object.entries(schema).forEach(([key, field]) => {
-                if (!filters.filters[key] && field.facet) {
+              const facetsToShow =
+                typeof request.params?.facets === "string"
+                  ? [request.params?.facets]
+                  : request.params?.facets || [];
+              facetsToShow.forEach((key) => {
+                if (!filters.filters[key]) {
                   // need to add empty filter, so that `response.filters` would contain data for it
-                  filters.filters[key] = [];
+                  filters.filters[key] = { any: [] };
                 }
               });
 
               const response = await index.search(query, filters);
 
               const page = request.params?.page || 0;
-              const hitsPerPage = request.params?.hitsPerPage || 16;
+              const hitsPerPage =
+                request.params?.hitsPerPage === undefined
+                  ? 16
+                  : request.params?.hitsPerPage;
               const hits = await Promise.all(
                 response.results
                   .slice(page * hitsPerPage, (page + 1) * hitsPerPage)
                   .map(adaptHit)
               );
               const nbHits = response.results.length;
-              const facets = empty ? await index.filters() : response.filters;
-              const maxValuesPerFacet = request.params?.maxValuesPerFacet || 10;
+
+              const facetsRaw = empty
+                ? await index.filters()
+                : response.filters;
+              const facets: FacetsResponse = {};
+              facetsToShow.forEach((key) => (facets[key] = facetsRaw[key]));
+
+              const maxValuesPerFacet =
+                request.params?.maxValuesPerFacet === undefined
+                  ? 10
+                  : request.params?.maxValuesPerFacet;
 
               return {
                 hits,
                 page,
                 hitsPerPage,
                 nbHits,
-                nbPages: Math.ceil(nbHits / hitsPerPage),
+                nbPages:
+                  hitsPerPage === 0 ? 0 : Math.ceil(nbHits / hitsPerPage),
                 ...adaptFacets(facets, maxValuesPerFacet, schema),
                 processingTimeMS: response.timings.total,
                 query: request.params?.query,
@@ -87,9 +104,11 @@ export function getSearchClient<S extends Schema>(
             const query = request.params?.query?.trim() || null;
             const filters = adaptRequest(request, await initialFacets);
             const empty = isEmpty(filters.filters) && !query;
-            Object.entries(schema).forEach(([key, field]) => {
-              if (!filters.filters[key] && field.facet) {
-                filters.filters[key] = [];
+            const facetsToShow = [request.params.facetName];
+            facetsToShow.forEach((key) => {
+              if (!filters.filters[key]) {
+                // need to add empty filter, so that `response.filters` would contain data for it
+                filters.filters[key] = { any: [] };
               }
             });
 
@@ -99,12 +118,14 @@ export function getSearchClient<S extends Schema>(
 
             return {
               exhaustiveFacetsCount: true,
+              // this is stupidly slow, maybe use Trie
               facetHits: Object.entries(facets[request.params.facetName])
                 .filter(
                   ([value, count]: [string, any]) =>
+                    count > 0 &&
                     value
                       .toLocaleLowerCase()
-                      .startsWith(request.params.facetQuery) && count > 0
+                      .startsWith(request.params.facetQuery)
                 )
                 .sort((a: [string, any], b: [string, any]) => b[1] - a[1])
                 .slice(

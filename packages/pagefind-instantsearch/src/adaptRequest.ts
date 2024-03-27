@@ -8,6 +8,7 @@ export function adaptRequest<S extends Schema>(
   initialFacets: FacetsResponse,
   _schema?: S
 ) {
+  // maybe memoize filters
   return {
     sort: adaptSort(request.indexName),
     filters: {
