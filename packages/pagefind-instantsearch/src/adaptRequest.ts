@@ -1,15 +1,45 @@
 import { MultipleQueriesQuery } from "@algolia/client-search";
 import { Schema } from "./Facets";
+export type FacetsResponse = Record<string, Record<string, number>>;
+type NumericFilter = Record<string, { from?: number; to?: number }>;
 
 export function adaptRequest<S extends Schema>(
   request: MultipleQueriesQuery,
+  initialFacets: FacetsResponse,
   _schema?: S
 ) {
-  adaptNumericFilters(request.params?.numericFilters as any);
   return {
     sort: adaptSort(request.indexName),
-    filters: adaptFacetFilters(request.params?.facetFilters as any),
+    filters: {
+      ...adaptFacetFilters(request.params?.facetFilters as any),
+      ...mapNumericFilter(
+        adaptNumericFilters(request.params?.numericFilters as any),
+        initialFacets
+      ),
+    },
   };
+}
+
+// this is awfull hack, because there are no numeric filters in pagefind
+// I take all values from numeric facet and put in filter
+function mapNumericFilter(
+  filter: NumericFilter,
+  initialFacets: FacetsResponse
+) {
+  if (!initialFacets) return {};
+
+  return Object.keys(filter).reduce((acc, key) => {
+    acc[key] = {
+      any: Object.keys(initialFacets[key]).filter(
+        (x) =>
+          // @ts-ignore
+          (filter[key].from === undefined || x >= filter[key].from) &&
+          // @ts-ignore
+          (filter[key].to === undefined || x <= filter[key].to)
+      ),
+    };
+    return acc;
+  }, {} as Record<string, { any: any[] }>);
 }
 
 export function adaptSort(indexName?: string) {
@@ -59,8 +89,7 @@ export function adaptFacetFilter(facet: string, filter: Record<string, any>) {
 export function adaptNumericFilters(
   numericFilters: string | string[] | string[][] | undefined
 ) {
-  const filter: Record<string, { from?: number; to?: number }> =
-    Object.create(null);
+  const filter: NumericFilter = Object.create(null);
 
   if (!numericFilters) return filter;
   if (typeof numericFilters === "string") {

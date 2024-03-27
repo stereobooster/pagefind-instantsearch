@@ -11,7 +11,7 @@ import { Schema as S } from "./Facets";
 export type Schema = S;
 
 import { adaptHit, adaptFacets } from "./adaptResponse";
-import { adaptRequest } from "./adaptRequest";
+import { FacetsResponse, adaptRequest } from "./adaptRequest";
 
 const isEmpty = (o: any) => !o || Object.keys(o).length === 0;
 
@@ -19,9 +19,10 @@ export function getSearchClient<S extends Schema>(
   clientPromise: Promise<any>,
   schema: S
 ): SearchClient {
+  let initialFacets: Promise<FacetsResponse>;
   const indexPromise = clientPromise.then(async (pagefind) => {
     pagefind.init();
-    // pagefind.filters();
+    initialFacets = pagefind.filters();
     return pagefind;
   });
 
@@ -35,7 +36,7 @@ export function getSearchClient<S extends Schema>(
             requests.map(async (request) => {
               // need to pass null in order to filter without search
               const query = request.params?.query?.trim() || null;
-              const filters = adaptRequest(request);
+              const filters = adaptRequest(request, await initialFacets);
               const empty = isEmpty(filters.filters) && !query;
               Object.entries(schema).forEach(([key, field]) => {
                 if (!filters.filters[key] && field.facet) {
@@ -84,7 +85,7 @@ export function getSearchClient<S extends Schema>(
         Promise.all(
           requests.map(async (request) => {
             const query = request.params?.query?.trim() || null;
-            const filters = adaptRequest(request);
+            const filters = adaptRequest(request, await initialFacets);
             const empty = isEmpty(filters.filters) && !query;
             Object.entries(schema).forEach(([key, field]) => {
               if (!filters.filters[key] && field.facet) {
