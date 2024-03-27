@@ -13,7 +13,7 @@ export type Schema = S;
 import { adaptHit, adaptFacets } from "./adaptResponse";
 import { adaptRequest } from "./adaptRequest";
 
-const isEmpty = (o: Record<string, any>) => Object.keys(o).length === 0;
+const isEmpty = (o: any) => !o || Object.keys(o).length === 0;
 
 export function getSearchClient<S extends Schema>(
   clientPromise: Promise<any>,
@@ -21,7 +21,7 @@ export function getSearchClient<S extends Schema>(
 ): SearchClient {
   const indexPromise = clientPromise.then(async (pagefind) => {
     pagefind.init();
-    pagefind.filters();
+    // pagefind.filters();
     return pagefind;
   });
 
@@ -33,11 +33,18 @@ export function getSearchClient<S extends Schema>(
         (index) =>
           Promise.all(
             requests.map(async (request) => {
-              const response = await index.search(
-                // https://github.com/CloudCannon/pagefind/issues/546#issuecomment-1896570871
-                request.params?.query?.trim() || null,
-                adaptRequest(request)
-              );
+              // need to pass null in order to filter without search
+              const query = request.params?.query?.trim() || null;
+              const filters = adaptRequest(request);
+              const empty = isEmpty(filters.filters) && !query;
+              Object.entries(schema).forEach(([key, field]) => {
+                if (!filters.filters[key] && field.facet) {
+                  // need to add empty filter, so that `response.filters` would contain data for it
+                  filters.filters[key] = [];
+                }
+              });
+
+              const response = await index.search(query, filters);
 
               const page = request.params?.page || 0;
               const hitsPerPage = request.params?.hitsPerPage || 16;
@@ -47,10 +54,7 @@ export function getSearchClient<S extends Schema>(
                   .map(adaptHit)
               );
               const nbHits = response.results.length;
-              // TODO: if search is null and there are no filters - use `await index.filters()`
-              const facets = isEmpty(response.filters)
-                ? await index.filters()
-                : response.filters;
+              const facets = empty ? await index.filters() : response.filters;
               const maxValuesPerFacet = request.params?.maxValuesPerFacet || 10;
 
               return {
@@ -79,15 +83,18 @@ export function getSearchClient<S extends Schema>(
       return indexPromise.then((index) =>
         Promise.all(
           requests.map(async (request) => {
-            const response = await index.search(
-              request.params?.query?.trim() || null,
-              adaptRequest(request)
-            );
+            const query = request.params?.query?.trim() || null;
+            const filters = adaptRequest(request);
+            const empty = isEmpty(filters.filters) && !query;
+            Object.entries(schema).forEach(([key, field]) => {
+              if (!filters.filters[key] && field.facet) {
+                filters.filters[key] = [];
+              }
+            });
 
-            // TODO: if search is null and there are no filters - use `await index.filters()`
-            const facets = isEmpty(response.filters)
-              ? await index.filters()
-              : response.filters;
+            const response = await index.search(query, filters);
+
+            const facets = empty ? await index.filters() : response.filters;
 
             return {
               exhaustiveFacetsCount: true,
